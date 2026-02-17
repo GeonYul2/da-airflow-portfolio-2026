@@ -1,0 +1,9 @@
+customer_id,signup_date,region,channel
+C001,2026-01-28,KR,organic
+C002,2026-01-29,US,paid_ads
+C003,2026-01-30,US,organic
+C004,2026-02-01,JP,partner
+C005,2026-02-02,KR,organic
+C006,2026-02-03,US,paid_ads
+C007,2026-02-04,KR,partner
+C008,2026-02-05,JP,organic
