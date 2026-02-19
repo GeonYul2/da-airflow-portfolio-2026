@@ -33,6 +33,19 @@ Airflow로 `raw → staging → mart → KPI → 품질검사 → 리포트`를 
   - Postgres: `sql/*`
   - MySQL/MariaDB: `sql/mysql/*`
 
+### Flow Chart
+```mermaid
+flowchart LR
+    A[data/raw CSV] --> B[load_raw.py]
+    B --> C[staging SQL]
+    C --> D[mart SQL]
+    D --> E[kpi SQL]
+    E --> F[quality checks]
+    F --> G{PASS?}
+    G -- Yes --> H[CSV/HTML/Summary export]
+    G -- No --> I[DAG fail + quality_check_runs]
+```
+
 ---
 
 ## 실행 방법
