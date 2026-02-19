@@ -1,39 +1,19 @@
 # DA KPI Pipeline (Portfolio)
 
-신입 데이터 분석가 포지션(재무/매출 분석, SQL/Python/Airflow) 기준으로 만든 **실무형 자동화 포트폴리오**입니다.
-
-## 한 줄 소개
-Airflow로 `raw → staging → mart → KPI → 품질검사 → 리포트`를 자동화하고,  
-**Daily/Weekly/Monthly 재무 KPI + 세그먼트 분석**을 제공하는 데이터 파이프라인입니다.
+Airflow + SQL + Python으로 구축한 **재무 KPI 자동화 데이터 파이프라인 포트폴리오**입니다.  
+신입 데이터 분석가 포지션(매출/비용 분석, 정합성 검증, 자동 리포팅) 기준으로 구성했습니다.
 
 ---
 
-## 핵심 성과
-- KPI 자동화: 매출/환불/순매출/마진 지표 일배치
-- 정합성 보장: null/중복/참조무결성/이상치 검사 + 실패 시 DAG 중단
-- 운영 가시성: `quality_check_runs` 테이블에 검사 이력 저장
-- 리포팅 자동화: CSV + HTML 대시보드 + 파이프라인 요약 리포트
-- 환경 적응성: **Postgres / MariaDB(MySQL) 듀얼 실행**
+## 1) 프로젝트 한 줄 요약
+
+`raw → staging → mart → KPI → quality checks → report export`를 일배치로 자동화하고,  
+Daily/Weekly/Monthly + Region/Channel 세그먼트 KPI를 제공합니다.
 
 ---
 
-## 기술 스택
-- SQL (계층형 모델링: staging/mart/KPI)
-- Python (로더, 품질검사, 리포트 자동화)
-- Airflow 3.1.x (오케스트레이션)
-- Docker Compose / Linux
-- Postgres, MariaDB
+## 2) 아키텍처 (Flow)
 
----
-
-## 아키텍처
-- 문서: [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)
-- DAG: `dags/da_kpi_daily.py`
-- SQL 레이어:
-  - Postgres: `sql/*`
-  - MySQL/MariaDB: `sql/mysql/*`
-
-### Flow Chart
 ```mermaid
 flowchart LR
     A[data/raw CSV] --> B[load_raw.py]
@@ -46,10 +26,29 @@ flowchart LR
     G -- No --> I[DAG fail + quality_check_runs]
 ```
 
+Airflow DAG: `dags/da_kpi_daily.py`
+
 ---
 
-## 실행 방법
-### 1) Postgres 모드
+## 3) 주요 구현 내용
+
+- KPI 자동화: 매출/환불/순매출/마진 지표 일·주·월 집계
+- 데이터 정합성 검증: null/중복/참조무결성/row count/kpi sanity 검사
+- 운영 추적성: `quality_check_runs`에 검사 이력 저장
+- 산출물 자동 생성:
+  - `logs/reports/kpi_daily_YYYY-MM-DD.csv`
+  - `logs/reports/dashboard_YYYY-MM-DD.html`
+  - `logs/reports/pipeline_summary_YYYY-MM-DD.txt`
+- 듀얼 DB 지원:
+  - Postgres (`sql/*`)
+  - MySQL/MariaDB (`sql/mysql/*`)
+
+---
+
+## 4) 실행 방법
+
+### A. Postgres 모드 (기본)
+
 ```bash
 cp .env.example .env
 make up
@@ -58,13 +57,17 @@ make run-linux
 make check
 ```
 
-### 2) MySQL/MariaDB 모드
-`.env`에:
+### B. MySQL/MariaDB 모드
+
+`.env`에 아래 값 설정:
+
 ```bash
 WAREHOUSE_DSN=mysql+pymysql://airflow:airflow@mariadb:3306/warehouse
 SQL_ROOT=sql/mysql
 ```
+
 실행:
+
 ```bash
 make up
 make init-mysql
@@ -74,22 +77,51 @@ make check-mysql
 
 ---
 
-## 채용공고 역량 매핑
-- 사업 KPI 분석: `mart_kpi_daily/weekly/monthly`
-- 재무/매출 데이터 관리: fact/mart 모델 + 재실행 가능한 파이프라인
-- 리포트/대시보드: CSV/HTML 자동 생성
-- 데이터 정합성 검증: 다중 품질검사 + 이력 관리
-- 협업/운영: RUNBOOK, METRICS, DATA_MODEL 문서화
+## 5) Airflow UI
+
+- URL: `http://localhost:8080`
+- ID: `admin`
+- 비밀번호 확인:
+
+```bash
+docker compose exec airflow-apiserver \
+  python -c "import json;print(json.load(open('/opt/airflow/simple_auth_manager_passwords.json.generated'))['admin'])"
+```
 
 ---
 
-## 공개 제출 전 점검
+## 6) 결과 확인 (면접/제출 시 추천)
+
 ```bash
-make audit-public
+cat logs/reports/kpi_daily_2026-02-17.csv
+cat logs/reports/pipeline_summary_2026-02-17.txt
 ```
 
-## 문서
+핵심 확인 포인트:
+- KPI 값이 기대치와 일치하는지
+- 품질검사 5종이 PASS인지
+
+---
+
+## 7) 시각화(대시보드) 관련 한계/확장
+
+- 현재 저장소는 **HTML 리포트 자동 생성**까지 포함합니다.
+- Tableau Public은 자동 refresh 제약이 있어, 본 포트폴리오는 수동/예시 시각화 기준으로 설명합니다.
+- 실무(Tableau Server/Cloud) 환경에서는 Airflow 마지막 태스크에서 Tableau REST API refresh 연계가 가능합니다.
+
+---
+
+## 8) 문서
+
 - [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)
 - [`docs/METRICS.md`](docs/METRICS.md)
 - [`docs/DATA_MODEL.md`](docs/DATA_MODEL.md)
 - [`docs/RUNBOOK.md`](docs/RUNBOOK.md)
+
+---
+
+## 9) 공개 제출 전 점검
+
+```bash
+make audit-public
+```
