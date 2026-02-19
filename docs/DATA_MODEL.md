@@ -17,6 +17,10 @@
 - `fact_orders(order_id, customer_id, order_date, status)`
 - `fact_payments(payment_id, order_id, customer_id, paid_date, amount, refund_amount, net_amount)`
 - `mart_kpi_daily(kpi_date, orders, paying_customers, gross_revenue, refunds, net_revenue, gross_margin)`
+- `mart_kpi_weekly(week_start_date, week_end_date, orders, paying_customers, gross_revenue, refunds, net_revenue, gross_margin)`
+- `mart_kpi_monthly(month_start_date, month_end_date, orders, paying_customers, gross_revenue, refunds, net_revenue, gross_margin)`
+- `mart_kpi_segment_daily(kpi_date, region, channel, orders, paying_customers, gross_revenue, refunds, net_revenue, gross_margin)`
+- `quality_check_runs(id, checked_at, dag_run_id, target_date, check_name, status, result_row_count, sample_rows)`
 
 ## 관계
 - `dim_customer.customer_id` ← `fact_orders.customer_id`

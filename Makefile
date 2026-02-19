@@ -1,4 +1,4 @@
-.PHONY: up down init run-dag psql check logs
+.PHONY: up down init run-dag psql check logs run-linux reports init-mysql run-linux-mysql check-mysql
 
 up:
 	test -f .env || cp .env.example .env
@@ -8,7 +8,7 @@ down:
 	docker compose down
 
 init:
-	docker compose exec airflow-apiserver bash -lc "cd /opt/airflow/project && python -m scripts.run_sql_dir --dir sql/00_ddl"
+	docker compose exec airflow-apiserver bash -lc "cd /opt/airflow/project && python -m scripts.run_sql_dir --dir $${SQL_ROOT:-sql}/00_ddl"
 
 run-dag:
 	docker compose exec airflow-apiserver airflow dags trigger da_kpi_daily
@@ -21,3 +21,18 @@ check:
 
 logs:
 	docker compose logs -f airflow-scheduler airflow-apiserver airflow-dag-processor
+
+run-linux:
+	docker compose exec airflow-apiserver bash -lc "cd /opt/airflow/project && ./scripts/run_pipeline_linux.sh"
+
+reports:
+	ls -al logs/reports
+
+init-mysql:
+	docker compose exec -e WAREHOUSE_DSN=mysql+pymysql://airflow:airflow@mariadb:3306/warehouse -e SQL_ROOT=sql/mysql airflow-apiserver bash -lc "cd /opt/airflow/project && python -m scripts.run_sql_dir --dir sql/mysql/00_ddl"
+
+run-linux-mysql:
+	docker compose exec -e WAREHOUSE_DSN=mysql+pymysql://airflow:airflow@mariadb:3306/warehouse -e SQL_ROOT=sql/mysql airflow-apiserver bash -lc "cd /opt/airflow/project && ./scripts/run_pipeline_linux.sh"
+
+check-mysql:
+	docker compose exec -e WAREHOUSE_DSN=mysql+pymysql://airflow:airflow@mariadb:3306/warehouse airflow-apiserver bash -lc "cd /opt/airflow/project && python -m scripts.check_tables"

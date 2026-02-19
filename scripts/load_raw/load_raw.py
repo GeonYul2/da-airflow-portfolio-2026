@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import argparse
+import csv
 import time
 from pathlib import Path
 
@@ -14,9 +15,23 @@ TABLE_FILE_MAP = {
 }
 
 
-def copy_csv(cur, table_name: str, file_path: Path):
+def insert_csv_rows(cur, table_name: str, file_path: Path):
     with file_path.open("r", encoding="utf-8") as f:
-        cur.copy_expert(f"COPY {table_name} FROM STDIN WITH CSV HEADER", f)
+        reader = csv.DictReader(f)
+        columns = reader.fieldnames or []
+        if not columns:
+            raise ValueError(f"No columns found in CSV header: {file_path}")
+
+        placeholders = ", ".join(["%s"] * len(columns))
+        column_sql = ", ".join(columns)
+        sql = f"INSERT INTO {table_name} ({column_sql}) VALUES ({placeholders})"
+
+        rows = []
+        for row in reader:
+            rows.append(tuple((row[col] if row[col] != "" else None) for col in columns))
+
+        if rows:
+            cur.executemany(sql, rows)
 
 
 def log_count(cur, table_name: str):
@@ -35,13 +50,14 @@ def main():
 
     with get_connection() as conn:
         with conn.cursor() as cur:
-            cur.execute("TRUNCATE TABLE raw_customers, raw_orders, raw_payments, raw_costs")
+            for table_name in TABLE_FILE_MAP:
+                cur.execute(f"TRUNCATE TABLE {table_name}")
 
             for table_name, file_name in TABLE_FILE_MAP.items():
                 file_path = data_dir / file_name
                 if not file_path.exists():
                     raise FileNotFoundError(f"Missing file: {file_path}")
-                copy_csv(cur, table_name, file_path)
+                insert_csv_rows(cur, table_name, file_path)
                 log_count(cur, table_name)
 
         conn.commit()

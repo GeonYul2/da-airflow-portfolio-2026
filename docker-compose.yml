@@ -13,7 +13,9 @@ x-airflow-common: &airflow-common
     AIRFLOW__CORE__EXECUTION_API_SERVER_URL: http://airflow-apiserver:8080/execution/
     AIRFLOW__API__SECRET_KEY: local-dev-secret-local-dev-secret-local-dev-secret-local-dev-secret
     AIRFLOW__API_AUTH__JWT_SECRET: local-dev-jwt-secret-local-dev-jwt-secret-local-dev-jwt-secret-local-dev-jwt-secret
-    WAREHOUSE_DSN: postgresql://airflow:airflow@postgres:5432/warehouse
+    WAREHOUSE_DSN: ${WAREHOUSE_DSN:-postgresql://airflow:airflow@postgres:5432/warehouse}
+    SQL_ROOT: ${SQL_ROOT:-sql}
+    RAW_FRESHNESS_MAX_HOURS: ${RAW_FRESHNESS_MAX_HOURS:-168}
     _AIRFLOW_WWW_USER_CREATE: "true"
     _AIRFLOW_WWW_USER_USERNAME: admin
     _AIRFLOW_WWW_USER_PASSWORD: admin
@@ -41,6 +43,21 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+
+  mariadb:
+    image: mariadb:11
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: warehouse
+      MYSQL_USER: airflow
+      MYSQL_PASSWORD: airflow
+    volumes:
+      - mariadb_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mariadb-admin ping -h localhost -uroot -proot || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
 
   airflow-init:
     <<: *airflow-common
@@ -77,3 +94,4 @@ services:
 
 volumes:
   postgres_data:
+  mariadb_data:

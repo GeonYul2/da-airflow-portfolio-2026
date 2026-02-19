@@ -25,7 +25,7 @@ def main():
             net_revenue,
             gross_margin
         FROM mart_kpi_daily
-        WHERE kpi_date = %s::date
+        WHERE kpi_date = %s
     """
 
     with get_connection() as conn:
