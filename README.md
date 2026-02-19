@@ -109,6 +109,13 @@ make run-linux
 ## 면접 답변 스토리라인
 - `docs/INTERVIEW_STORYLINE.md` 참고 (60초 자기소개, STAR 사례, 예상질문 포함)
 
+## 공개 제출 전 안전 점검
+```bash
+make audit-public
+```
+- 가이드는 `docs/PUBLIC_SUBMISSION_GUIDE.md` 참고
+- Public 저장소는 커밋/브랜치/파일이 모두 공개됨
+
 ## 문서
 - [PRD](docs/PRD.md)
 - [METRICS](docs/METRICS.md)
@@ -116,3 +123,4 @@ make run-linux
 - [RUNBOOK](docs/RUNBOOK.md)
 - [ARCHITECTURE](docs/ARCHITECTURE.md)
 - [INTERVIEW_STORYLINE](docs/INTERVIEW_STORYLINE.md)
+- [PUBLIC_SUBMISSION_GUIDE](docs/PUBLIC_SUBMISSION_GUIDE.md)

@@ -1,4 +1,4 @@
-.PHONY: up down init run-dag psql check logs run-linux reports init-mysql run-linux-mysql check-mysql
+.PHONY: up down init run-dag psql check logs run-linux reports init-mysql run-linux-mysql check-mysql audit-public
 
 up:
 	test -f .env || cp .env.example .env
@@ -36,3 +36,6 @@ run-linux-mysql:
 
 check-mysql:
 	docker compose exec -e WAREHOUSE_DSN=mysql+pymysql://airflow:airflow@mariadb:3306/warehouse airflow-apiserver bash -lc "cd /opt/airflow/project && python -m scripts.check_tables"
+
+audit-public:
+	python3 scripts/audit_public_release.py
