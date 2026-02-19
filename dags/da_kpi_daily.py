@@ -88,7 +88,8 @@ with DAG(
         bash_command=(
             "cd /opt/airflow/project && "
             "python -m scripts.run_quality_checks "
-            f"--target-date {TARGET_DATE_TEMPLATE} --dir ${SQL_ROOT:-sql}/90_quality --run-id {RUN_ID_TEMPLATE}"
+            "--dir ${SQL_ROOT:-sql}/90_quality "
+            f"--target-date {TARGET_DATE_TEMPLATE} --run-id {RUN_ID_TEMPLATE}"
         ),
     )
 
