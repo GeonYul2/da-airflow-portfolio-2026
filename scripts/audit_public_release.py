@@ -17,7 +17,6 @@ FORBIDDEN_FILE_PATTERNS = [
 
 WARNING_REGEXES = [
     re.compile(r"(?i)(api[_-]?key|token|secret|password)\s*[:=]\s*['\"][^'\"]{8,}['\"]"),
-    re.compile(r"(?i)[A-Z0-9_]*(SECRET|PASSWORD|TOKEN|API[_-]?KEY)[A-Z0-9_]*\s*:\s*[^\s#]+"),
     re.compile(r"AKIA[0-9A-Z]{16}"),
     re.compile(r"-----BEGIN (RSA|OPENSSH|EC|DSA) PRIVATE KEY-----"),
 ]

@@ -11,14 +11,14 @@ x-airflow-common: &airflow-common
     AIRFLOW__CORE__HOSTNAME_CALLABLE: socket.gethostname
     AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres:5432/airflow
     AIRFLOW__CORE__EXECUTION_API_SERVER_URL: http://airflow-apiserver:8080/execution/
-    AIRFLOW__API__SECRET_KEY: local-dev-secret-local-dev-secret-local-dev-secret-local-dev-secret
-    AIRFLOW__API_AUTH__JWT_SECRET: local-dev-jwt-secret-local-dev-jwt-secret-local-dev-jwt-secret-local-dev-jwt-secret
+    AIRFLOW__API__SECRET_KEY: ${AIRFLOW_API_SECRET_KEY:-local-dev-secret-local-dev-secret-local-dev-secret-local-dev-secret}
+    AIRFLOW__API_AUTH__JWT_SECRET: ${AIRFLOW_API_AUTH_JWT_SECRET:-local-dev-jwt-secret-local-dev-jwt-secret-local-dev-jwt-secret-local-dev-jwt-secret}
     WAREHOUSE_DSN: ${WAREHOUSE_DSN:-postgresql://airflow:airflow@postgres:5432/warehouse}
     SQL_ROOT: ${SQL_ROOT:-sql}
     RAW_FRESHNESS_MAX_HOURS: ${RAW_FRESHNESS_MAX_HOURS:-168}
     _AIRFLOW_WWW_USER_CREATE: "true"
     _AIRFLOW_WWW_USER_USERNAME: admin
-    _AIRFLOW_WWW_USER_PASSWORD: admin
+    _AIRFLOW_WWW_USER_PASSWORD: ${AIRFLOW_WWW_USER_PASSWORD:-admin}
   volumes:
     - ./dags:/opt/airflow/dags
     - ./logs:/opt/airflow/logs
@@ -33,7 +33,7 @@ services:
     image: postgres:15
     environment:
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
       POSTGRES_DB: postgres
     volumes:
       - postgres_data:/var/lib/postgresql/data
@@ -47,10 +47,10 @@ services:
   mariadb:
     image: mariadb:11
     environment:
-      MYSQL_ROOT_PASSWORD: root
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
       MYSQL_DATABASE: warehouse
       MYSQL_USER: airflow
-      MYSQL_PASSWORD: airflow
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-airflow}
     volumes:
       - mariadb_data:/var/lib/mysql
     healthcheck:
