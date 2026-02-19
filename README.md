@@ -70,17 +70,13 @@ make check-mysql
 
 ---
 
-## 면접에서 보여줄 포인트
-1. 10분 데모: DAG 실행 → KPI 조회 → HTML 리포트 확인
-2. 실패 시나리오: 품질검사 fail 및 이력 확인
-3. 확장성: 멀티 DB 지원 + 운영 자동화 설계
-
-면접 스토리: [`docs/INTERVIEW_STORYLINE.md`](docs/INTERVIEW_STORYLINE.md)
-
----
-
 ## 공개 제출 전 점검
 ```bash
 make audit-public
 ```
-가이드: [`docs/PUBLIC_SUBMISSION_GUIDE.md`](docs/PUBLIC_SUBMISSION_GUIDE.md)
+
+## 문서
+- [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)
+- [`docs/METRICS.md`](docs/METRICS.md)
+- [`docs/DATA_MODEL.md`](docs/DATA_MODEL.md)
+- [`docs/RUNBOOK.md`](docs/RUNBOOK.md)
